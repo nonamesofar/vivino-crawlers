@@ -25,7 +25,8 @@ wine_types = [
 ]
 
 def get_wine_pages(page):
-    r = requests.get(
+   #would be great to constant these parameters
+   r = requests.get(
         "https://www.vivino.com/api/explore/explore",
         params={
             "country_code": "FR",
@@ -44,9 +45,13 @@ def get_wine_pages(page):
         },
         verify=False
     )
+
+    #Download the raw json data
     with open('raw/response-'+f'{page}'+'.json', 'w') as f:
         json.dump(r.json(), f, indent=4)
 
+    #Structure is define based on the fields I want to see in the final csv
+    #Go through the above json and extract the fields you want
     results = [
         (
             t["vintage"]["name"],
@@ -68,6 +73,7 @@ def get_wine_pages(page):
 
     return results
 
+#returns number of records for the given query
 def get_wine_results():
     r = requests.get(
         "https://www.vivino.com/api/explore/explore",
@@ -133,7 +139,6 @@ dataframe = pd.DataFrame()
 for page in range(1,2):
     wine_data = get_wine_pages(page)
     df = pd.DataFrame(wine_data, columns=[
-#        'Winery', 'Wine', 'Year', 'Country', 'Region', 'Rating', 'Price'
         'Name', 'Type', 'Wine', 'Region', 'Country', 'Winery', 'Regional Name', 'Varietal Name', 'Year', 'Rating', 'Price', 'Currency', 'Bottle Type'
     ])
     dataframe =pd.concat([dataframe, df], ignore_index=True)
